@@ -1,0 +1,333 @@
+
+This is a write-up about some useful packages to improve
+the quality and look of your code and some workflow
+improvements.
+
+Ping me on the WTM Slack channel if you have any questions,
+suggestions, improvements etc.
+
+This might appear long, but really there are only 5 or 6 tools
+and once set-up, you are unlikely to ever change them much.
+
+==========================
+
+This assumes you have `npm` installed, as we'll be using it to
+install the following packages
+
+```
+@babel/cli - https://babeljs.io/
+@babel/core
+@babel/plugin-proposal-class-properties
+@babel/plugin-proposal-private-methods
+@babel/plugin-syntax-dynamic-import
+@babel/polyfill
+@babel/preset-env
+babel-eslint
+eslint - https://eslint.org/
+husky - https://github.com/typicode/husky
+lint-staged - https://github.com/okonet/lint-staged
+prettier - https://prettier.io/
+pretty-quick - https://github.com/azz/pretty-quick
+```
+
+All but one is a dev dependency, so install like this:
+
+$ npm i -S @babel/polyfill
+$ npm i -D @babel/cli @babel/core @babel/plugin-proposal-class-properties @babel/plugin-proposal-private-methods
+$ npm i -D @babel/plugin-syntax-dynamic-import @babel/polyfill @babel/preset-env babel-eslint
+$ npm i -D eslint husky lint-staged prettier pretty-quick
+
+================================================================================
+
+1: eslint (and babel-eslint) `https://eslint.org/`
+---------
+
+As the site says, this finds and fixes problems in your JavaScript code.
+
+This will scan your code and, given a configuration file, report on
+errors/warnings it finds. It is VERY configurable, but... we tend
+to run it in parallel with prettier, which has some overlap and makes the
+configuration setup easier.
+
+Obviously the definition of 'good' code style is a bit religious, so
+I keep the configuration as close to the settings that come out of
+the box.  That one 'special' format/style you like... you won't care or remember
+about it in 2 weeks :)
+
+For config files or config sections you have to create, I use the following format,
+where you grab the code/config between the lines with the 'scissors'
+
+---- >8 ---- NAME OF FILE ---- 8< ----
+.
+.    code/config
+.
+---- >8 ---- NAME OF FILE ---- 8< ----
+
+So, for eslint, we create a file in the top level directory
+of your project, where the package.json file lives.
+
+---- >8 ---- .eslintrc.json ---- 8< ----
+{
+  "root": true,
+  "extends": ["eslint:recommended", "prettier"],
+  "rules": {
+    "no-console": 1,
+    "no-unused-vars": "error"
+  },
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module"
+  },
+  "env": {
+    "es6": true,
+    "browser": true,
+    "node": true
+  }
+}
+---- >8 ---- .eslintrc.json ---- 8< ----
+
+I purposely kept things simple. You can add the rules you like.
+
+One thing to notice is I use `babel-eslint` as the parser.
+
+This allows me to use bleeding-edge JS code and have `babel`
+compile it down the ES5 so it can work in all (most) browsers/environments.
+
+If you are using TypeScript (which you really should investigate!) you'll
+need a different parser.
+
+
+You may not want to lint every file in your project, so you can ignore
+files/directories with:
+
+---- >8 ---- .eslintignore ---- 8< ----
+node_modules/
+---- >8 ---- .eslintignore ---- 8< ----
+
+As it happens eslint ignores (the top level) node_modules directory by default,
+but this was just an example.
+
+================================================================================
+
+2: Prettier.  Use it and never argue about code-style again! Even with yourself :)
+------------
+
+The reason (for me) why this is useful, is that if you are on a big team
+of developers and you all use a DIFFERENT style, then the git commit diff
+always shows a crazy number of changes when it is often just a formatting
+change.
+
+By using prettier, a team can agree on a single coding style.
+
+Well, even better, they can agree on a single coding style that will be *committed*
+
+This frees up developers to use a different coding style as they work and have 
+that code formatted as the agreed `commit-style`
+
+But... really, just use the agreed commit-style.
+
+prettier has very FEW options:
+
+These are the general overrides I use now. Well, at my age, `"tabWidth": 2` is
+a bit painful :)
+
+---- >8 ---- .prettierrc ---- 8< ----
+{
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "all",
+}
+---- >8 ---- .prettierrc ---- 8< ----
+
+
+Prettier also can ignore files. These are just examples.
+
+It will become obvious on your project which ones to ignore.
+
+---- >8 ---- .prettierignore ---- 8< ----
+*.log
+.DS_Store
+.cache/
+build/
+coverage/
+dist/
+node_modules/
+package-lock.json
+public/
+---- >8 ---- .prettierignore ---- 8< ----
+
+
+================================================================================
+
+
+3: Husky - https://github.com/typicode/husky
+--------
+
+Husky allows you to create really useful git hooks;
+the most common being `pre-commit` and `pre-push`
+
+This allows you to run a whole suite of tools before you
+commit code to git or push code to a central repo.
+
+The most common tasks we run are linting, formatting and tests. Surpise!
+
+This REALLY helps to prevent commiting broken/crappy-looking code.
+
+I configure husky in the package.json file: (you can use a .huskyrc file etc instead)
+
+Here is an example.
+
+// husky section in package.json
+---- >8 ---- package.json ---- 8< ----
+
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint",
+      "pre-push": "npm run test && npm run test:coverage",
+      "...": "..."
+    }
+  }
+
+---- >8 ---- package.json ---- 8< ----
+
+================================================================================
+
+
+4: babel - https://babeljs.io/
+--------
+
+Babel allows you to use modern JS syntax and even up-and-coming JS proposals
+now and have your JS code *transpiled* to ES5, which all browsers understand.
+
+There are a gazillion plugins, but I will only show a few that I use.
+
+I have a few in there for React, because JSX is a syntax that React uses
+but is not JavaScript.
+
+---- >8 ---- .babelrc ---- 8< ----
+{
+    "presets": [
+        [
+            "@babel/preset-env",
+            {
+                "targets": [
+                    "last 2 versions",
+                    "not dead",
+                    "not < 2%",
+                    "not ie 11"
+                ],
+                "useBuiltIns": "entry",
+                "corejs": "3.2.1"
+            }
+        ],
+        "@babel/preset-react"
+    ],
+    "plugins": [
+        "react-hot-loader/babel",
+        "@babel/plugin-proposal-class-properties",
+        "@babel/plugin-syntax-dynamic-import"
+    ],
+    "env": {
+        "test": {
+            "plugins": []
+        }
+    }
+}
+---- >8 ---- .babelrc ---- 8< ----
+
+
+================================================================================
+
+5: lint-staged - https://github.com/okonet/lint-staged
+--------------
+
+This is an npm package I use to ONLY lint (eslint/babel-eslint) files that are
+staged for commit.
+
+The reason I use this is that if I do a commit, I don,t want to keep having to lint
+ALL the files in the project over and over.
+
+As the project gets bigger, this part gets slower and slower (and more annoying :) )
+
+Given a "lint-staged" section in package.json, only files that are staged for commit
+(that match other patterns you might provide) are linted.
+
+You can also run other programs against those files.
+
+As you can see below, I run prettier (well pretty-quick, which is to prettier
+what lint-staged is to eslint)
+
+// lint-staged section in package.json
+---- >8 ---- package.json ---- 8< ----
+
+  "lint-staged": {
+    "*.+(js|jsx)": [
+      "pretty-quick --staged",
+      "eslint --fix",
+      "git add"
+    ],
+    "*.+(json|css|md)": [
+      "pretty-quick --staged",
+      "git add"
+    ]
+  },
+
+---- >8 ---- package.json ---- 8< ----
+
+
+================================================================================
+
+6: pretty-quick - https://github.com/azz/pretty-quick
+---------------
+
+This is similar to the eslint/lint-staged combo.
+
+Instead of running prettier against all .js files all the time,
+it just runs against the staged ones.
+
+There is no configuration as such, just the npm package.
+
+That said, see the end for my package.json "scripts" section.
+
+
+================================================================================
+
+7: package.json "scripts" section.
+-------------------------
+
+So, we now have a lot of tools installed, but we want to be able to run
+some of these via npm/npx
+
+Here is my "scripts" section, with some explanations:
+
+I have removed some for brevity...
+
+// "scripts" section in package.json
+---- >8 ---- package.json ---- 8< ----
+
+  "scripts": {
+    "format": "pretty-quick --pattern \"**/*.*(js|jsx|scss|sass|css|json|ts|html)\"",
+    "format:full": "prettier --write \"./**/*.{js,jsx,css,htm,json,ts,html,sass,scss}\"",
+    "lint": "lint-staged",
+    "test": "npm run test:ava",
+    "test:ava": "ava --verbose",
+    "test:ava:watch": "ava --watch",
+    "test:coverage": "nyc ava --verbose",
+    "test:jest": "jest",
+  },
+---- >8 ---- package.json ---- 8< ----
+
+
+Here I have some convenience 'scripts'
+
+I have "format:full" - (npm run format:full) for when I first download a repo and want to
+format everything.
+
+You will notice that in the "husky" section of package.json I run 'npm run lint' and 'npm run test'
+
+This runs the respective scripts above and allows me to change things in one place if I need to,
+say with the testing framework, if I wanted to switch from ava to mocha or jest.
+
+
