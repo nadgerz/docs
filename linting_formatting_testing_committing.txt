@@ -1,9 +1,8 @@
 
-This is a write-up about some useful packages to improve
-the quality and look of your code and some workflow
-improvements.
+This is a write-up about some useful packages that might help improve
+the quality, look of your code and some workflow improvements.
 
-Ping me on the WTM Slack channel if you have any questions,
+Ping me on the WTMB Slack channel if you have any questions,
 suggestions, improvements etc.
 
 This might appear long, but really there are only 5 or 6 tools
@@ -15,12 +14,12 @@ This assumes you have `npm` installed, as we'll be using it to
 install the following packages
 
 ```
+core-js
 @babel/cli - https://babeljs.io/
 @babel/core
 @babel/plugin-proposal-class-properties
 @babel/plugin-proposal-private-methods
 @babel/plugin-syntax-dynamic-import
-@babel/polyfill
 @babel/preset-env
 babel-eslint
 eslint - https://eslint.org/
@@ -28,13 +27,14 @@ husky - https://github.com/typicode/husky
 lint-staged - https://github.com/okonet/lint-staged
 prettier - https://prettier.io/
 pretty-quick - https://github.com/azz/pretty-quick
+regenerator-runtime
 ```
 
 All but one is a dev dependency, so install like this:
 
-$ npm i -S @babel/polyfill
+$ npm i -S core-js regenerator-runtime
 $ npm i -D @babel/cli @babel/core @babel/plugin-proposal-class-properties @babel/plugin-proposal-private-methods
-$ npm i -D @babel/plugin-syntax-dynamic-import @babel/polyfill @babel/preset-env babel-eslint
+$ npm i -D @babel/plugin-syntax-dynamic-import @babel/preset-env babel-eslint
 $ npm i -D eslint husky lint-staged prettier pretty-quick
 
 ================================================================================
@@ -115,7 +115,7 @@ but this was just an example.
 
 The reason (for me) why this is useful, is that if you are on a big team
 of developers and you all use a DIFFERENT style, then the git commit diff
-always shows a crazy number of changes when it is often just a formatting
+output always shows a crazy number of changes when it is often just a formatting
 change.
 
 By using prettier, a team can agree on a single coding style.
@@ -169,11 +169,11 @@ Husky allows you to create really useful git hooks;
 the most common being `pre-commit` and `pre-push`
 
 This allows you to run a whole suite of tools before you
-commit code to git or push code to a central repo.
+commit code to git or push code to a central repository.
 
-The most common tasks we run are linting, formatting and tests. Surpise!
+The most common tasks we run are linting, formatting and tests. Surprise!
 
-This REALLY helps to prevent commiting broken/crappy-looking code.
+This REALLY helps to prevent committing broken/crappy-looking code.
 
 I configure husky in the package.json file: (you can use a .huskyrc file etc instead)
 
@@ -204,7 +204,7 @@ now and have your JS code *transpiled* to ES5, which all browsers understand.
 There are a gazillion plugins, but I will only show a few that I use.
 
 I have a few in there for React, because JSX is a syntax that React uses
-but is not JavaScript.
+but is not valid JavaScript.
 
 ---- >8 ---- .babelrc ---- 8< ----
 {
@@ -227,6 +227,7 @@ but is not JavaScript.
     "plugins": [
         "react-hot-loader/babel",
         "@babel/plugin-proposal-class-properties",
+		"@babel/plugin-proposal-private-methods",
         "@babel/plugin-syntax-dynamic-import"
     ],
     "env": {
@@ -246,7 +247,7 @@ but is not JavaScript.
 This is an npm package I use to ONLY lint (eslint/babel-eslint) files that are
 staged for commit.
 
-The reason I use this is that if I do a commit, I don,t want to keep having to lint
+The reason I use this is that if I do a commit, I don't want to keep having to lint
 ALL the files in the project over and over.
 
 As the project gets bigger, this part gets slower and slower (and more annoying :) )
