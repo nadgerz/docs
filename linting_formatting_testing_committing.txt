@@ -14,7 +14,6 @@ This assumes you have `npm` installed, as we'll be using it to
 install the following packages
 
 ```
-core-js
 @babel/cli - https://babeljs.io/
 @babel/core
 @babel/plugin-proposal-class-properties
@@ -22,6 +21,7 @@ core-js
 @babel/plugin-syntax-dynamic-import
 @babel/preset-env
 babel-eslint
+core-js
 eslint - https://eslint.org/
 husky - https://github.com/typicode/husky
 lint-staged - https://github.com/okonet/lint-staged
@@ -30,7 +30,7 @@ pretty-quick - https://github.com/azz/pretty-quick
 regenerator-runtime
 ```
 
-All but one is a dev dependency, so install like this:
+A few are not dev dependencies... so install like this:
 
 $ npm i -S core-js regenerator-runtime
 $ npm i -D @babel/cli @babel/core @babel/plugin-proposal-class-properties @babel/plugin-proposal-private-methods
@@ -51,11 +51,15 @@ configuration setup easier.
 
 Obviously the definition of 'good' code style is a bit religious, so
 I keep the configuration as close to the settings that come out of
-the box.  That one 'special' format/style you like... you won't care or remember
+the box.
+
+That one 'special' format/style you like... you won't care or remember
 about it in 2 weeks :)
 
 For config files or config sections you have to create, I use the following format,
 where you grab the code/config between the lines with the 'scissors'
+
+e.g,
 
 ---- >8 ---- NAME OF FILE ---- 8< ----
 .
@@ -63,8 +67,12 @@ where you grab the code/config between the lines with the 'scissors'
 .
 ---- >8 ---- NAME OF FILE ---- 8< ----
 
+
 So, for eslint, we create a file in the top level directory
 of your project, where the package.json file lives.
+
+In fact most, if not all of these config files will be in that top-level
+directory.
 
 ---- >8 ---- .eslintrc.json ---- 8< ----
 {
@@ -87,7 +95,7 @@ of your project, where the package.json file lives.
 }
 ---- >8 ---- .eslintrc.json ---- 8< ----
 
-I purposely kept things simple. You can add the rules you like.
+I purposely kept things simple. You can add the rules you like/prefer/need.
 
 One thing to notice is I use `babel-eslint` as the parser.
 
@@ -95,7 +103,7 @@ This allows me to use bleeding-edge JS code and have `babel`
 compile it down the ES5 so it can work in all (most) browsers/environments.
 
 If you are using TypeScript (which you really should investigate!) you'll
-need a different parser.
+need a different parser, I suspect.
 
 
 You may not want to lint every file in your project, so you can ignore
@@ -108,13 +116,15 @@ node_modules/
 As it happens eslint ignores (the top level) node_modules directory by default,
 but this was just an example.
 
+Just keep adding directories/files as your project grows.
+
 ================================================================================
 
 2: Prettier.  Use it and never argue about code-style again! Even with yourself :)
 ------------
 
 The reason (for me) why this is useful, is that if you are on a big team
-of developers and you all use a DIFFERENT style, then the git commit diff
+of developers and you all use a DIFFERENT style, then the git commit diff/log
 output always shows a crazy number of changes when it is often just a formatting
 change.
 
@@ -123,7 +133,7 @@ By using prettier, a team can agree on a single coding style.
 Well, even better, they can agree on a single coding style that will be *committed*
 
 This frees up developers to use a different coding style as they work and have 
-that code formatted as the agreed `commit-style`
+that code formatted to the agreed `commit-style` when they commit.
 
 But... really, just use the agreed commit-style.
 
@@ -153,9 +163,11 @@ It will become obvious on your project which ones to ignore.
 build/
 coverage/
 dist/
+logs/
 node_modules/
 package-lock.json
 public/
+tmp/
 ---- >8 ---- .prettierignore ---- 8< ----
 
 
@@ -195,7 +207,7 @@ Here is an example.
 ================================================================================
 
 
-4: babel - https://babeljs.io/
+4: Babel - https://babeljs.io/
 --------
 
 Babel allows you to use modern JS syntax and even up-and-coming JS proposals
@@ -253,7 +265,7 @@ ALL the files in the project over and over.
 As the project gets bigger, this part gets slower and slower (and more annoying :) )
 
 Given a "lint-staged" section in package.json, only files that are staged for commit
-(that match other patterns you might provide) are linted.
+(that match other patterns you might provide, like file extension) are linted.
 
 You can also run other programs against those files.
 
@@ -323,12 +335,14 @@ I have removed some for brevity...
 
 Here I have some convenience 'scripts'
 
-I have "format:full" - (npm run format:full) for when I first download a repo and want to
-format everything.
+I have "format:full" - ($ npm run format:full) for when I first download a repo and want to
+format everything from the get-go.
 
 You will notice that in the "husky" section of package.json I run 'npm run lint' and 'npm run test'
 
-This runs the respective scripts above and allows me to change things in one place if I need to,
-say with the testing framework, if I wanted to switch from ava to mocha or jest.
+This runs the respective scripts above in the "scripts" section and allows me to
+change things in one place if I need to, say with the testing framework,
+if I wanted to switch from ava to mocha or jest.
 
 
+Have fun!
